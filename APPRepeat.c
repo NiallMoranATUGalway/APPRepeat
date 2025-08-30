@@ -4,13 +4,30 @@
 #include<stdlib.h>
 #include <stdbool.h>
 
-void AddPassenger();
+//passenger struct 
+typedef struct Passenger {
+    int pps;                        // unique identifier
+    char firstName[40];
+    char lastName[40];
+    int yearBorn;
+    char emailAddress[75];
+    char travelledFrom[40];
+    char travelClass[40];
+    char railTripsPerYear[20];
+    struct Passenger* next;
+} Passenger;
+
+
+void AddPassenger(Passenger** head);
 bool PasswordEntry();
 
 
+
 int main() {
+    Passenger* head = NULL;  // start of linked list
+
+
     int option;
-    //bool passwordCorrect;
 
     printf("--- Rail Ireland Passenger Database ---\n");
 
@@ -24,7 +41,7 @@ int main() {
         switch (option)
         {
         case 1:
-            AddPassenger();
+            AddPassenger(&head);
             break;
         default:
             break;
@@ -33,113 +50,9 @@ int main() {
     }
 	return 0;
 }
-//declarations
-void AddPassenger() {
-
-    printf("\n---Add Passenger---\n");
-    char name[40];
-    char lastName[40];
-    int yearBorn;
-    char emailAddress[75];
-    int option;
-    char travelledFrom[40];
-    char travelClass[40];
-    char railTripsPerYear[150];
-
-    //asking user for passenger details
-    printf("Please enter first name : ");
-    (void)scanf("%s", name);
-    
-    printf("Please enter last name : ");
-    (void)scanf("%s", lastName);
-
-    printf("Please enter year born : ");
-    (void)scanf("%d", &yearBorn);
-
-    printf("Please enter email address : ");
-    (void)scanf("%s", emailAddress);
-    
-
-    printf("Which of the following areas did you travel from?");
-    printf("\n1. Dublin");
-    printf("\n2. Leinster");
-    printf("\n3. Cannacht");
-    printf("\n4. Ulster");
-    printf("\n5. Munster\n");
-    printf("Enter number : ");
-    (void)scanf("%d", &option);
-
-    switch (option)
-    {
-    case 1: 
-        strcpy(travelledFrom, "Dublin");
-        break;
-    case 2:
-        strcpy(travelledFrom, "Leinster");
-        break;
-    case 3:
-        strcpy(travelledFrom, "Cannacht");
-        break;
-    case 4:
-        strcpy(travelledFrom, "Ulster");
-        break;
-    case 5:
-        strcpy(travelledFrom, "Munster");
-        break;
-    default:
-        strcpy(travelledFrom, "Invalid");
-        break;
-    }
-    
-
-    printf("What travel class did you use to travel by?");
-    printf("\n1. Economy");
-    printf("\n2. First Class\n");
-    printf("Enter number : ");
-    (void)scanf("%d", &option);
-
-    switch (option)
-    {
-    case 1:
-        strcpy(travelClass, "Economy");
-        break;
-    case 2:
-        strcpy(travelClass, "First Class");
-        break;
-    default:
-        strcpy(travelClass, "Invalid");
-        break;
-    }
 
 
-
-    printf("How many rail trips in Ireland do you make per year?");
-    printf("\n1. Less than three ");
-    printf("\n2. Less than five ");
-    printf("\n3. More than five\n");
-    printf("Enter number : ");
-    (void)scanf("%d", &option);
-
-    switch (option)
-    {
-    case 1:
-        strcpy(railTripsPerYear, "<3");
-        break;
-    case 2:
-        strcpy(railTripsPerYear, "<5");
-        break;
-    case 3:
-        strcpy(railTripsPerYear, "5+");
-        break;
-    default:
-        strcpy(railTripsPerYear, "Invalid");
-        break;
-    }
-
-    printf("\n%s %s %d %s ", name, lastName, yearBorn, emailAddress);
-    printf("%s %s %s", travelledFrom, travelClass, railTripsPerYear);
-}
-
+//reads file from login.txt and compares that to the user input
 bool PasswordEntry()
 {
     FILE* fptr;
@@ -183,4 +96,110 @@ bool PasswordEntry()
 
     return false;
     }
+}
+
+void AddPassenger(Passenger** head) {
+
+    //local declarations
+    int option;
+
+
+    Passenger* newP = (Passenger*)malloc(sizeof(Passenger));
+    if (!newP) {
+        printf("Memory allocation failed\n");
+        return;
+    }
+
+    //allocate memory for new passenger
+    printf("\n---Add Passenger---\n");
+    printf("Enter PPS number (integer) :  ");
+    (void)scanf("%d", &newP->pps);
+
+    printf("Please enter first name : ");
+    (void)scanf("%s", newP->firstName);
+
+    printf("Please enter last name : ");
+    (void)scanf("%s", newP->lastName);
+
+    printf("Please enter year born : ");
+    (void)scanf("%d", &newP->yearBorn);
+
+    printf("Please enter email address : ");
+    (void)scanf("%s", newP->emailAddress);
+
+    //area selection
+    printf("Which of the following areas did you travel from?");
+    printf("\n1. Dublin");
+    printf("\n2. Leinster");
+    printf("\n3. Connacht");
+    printf("\n4. Ulster");
+    printf("\n5. Munster\n");
+    printf("Enter number : ");
+    (void)scanf("%d", &option);
+
+    switch (option) {
+        case 1: 
+            strcpy(newP->travelledFrom, "Dublin");
+            break;
+        case 2: 
+            strcpy(newP->travelledFrom, "Leinster"); 
+            break;
+        case 3: 
+            strcpy(newP->travelledFrom, "Connacht"); 
+            break;
+        case 4: 
+            strcpy(newP->travelledFrom, "Ulster"); 
+            break;
+        case 5: 
+            strcpy(newP->travelledFrom, "Munster"); 
+            break;
+        default: 
+            strcpy(newP->travelledFrom, "Invalid"); 
+            break;
+    }
+
+    // travel class
+    printf("What travel class did you use to travel by?");
+    printf("\n1. Economy");
+    printf("\n2. First Class\n");
+    printf("Enter number : ");
+    (void)scanf("%d", &option);
+
+    if (option == 1) {
+        strcpy(newP->travelClass, "Economy");
+    }
+    else if (option == 2)
+    {
+        strcpy(newP->travelClass, "First Class");
+    }
+    else {
+        strcpy(newP->travelClass, "Invalid");
+    }
+
+    // trips per year
+    printf("How many rail trips in Ireland do you make per year?");
+    printf("\n1. Less than three ");
+    printf("\n2. Less than five ");
+    printf("\n3. More than five\n");
+    printf("Enter number : ");
+    (void)scanf("%d", &option);
+
+    if (option == 1) {
+        strcpy(newP->railTripsPerYear, "<3");
+    }
+    else if (option == 2) {
+        strcpy(newP->railTripsPerYear, "<5");
+    }
+    else if (option == 3) {
+        strcpy(newP->railTripsPerYear, "5+");
+    }
+    else {
+        strcpy(newP->railTripsPerYear, "Invalid");
+    }
+
+    // Insert at head of linked list
+    newP->next = *head;
+    *head = newP;
+
+    printf("\nPassenger added successfully\n");
 }
