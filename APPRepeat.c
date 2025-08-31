@@ -24,6 +24,8 @@ void DisplayAllPassengers(Passenger* head);
 void DisplayPassengerInfo(Passenger* head);
 void UpdatePassenger(Passenger* head);
 int DeletePassenger(Passenger** head);
+void GenerateStatistics(Passenger* head);
+void WriteReport(Passenger* head, const char* filename);
 
 
 int main() {
@@ -44,6 +46,8 @@ int main() {
             printf("3. Display passenger info\n");
             printf("4. Update passenger statistic\n");
             printf("5. Delete passenger\n");
+            printf("6. Generate Statistics\n");
+            printf("7. Print all passenger details into a report file\n");
             printf("10. Exit\n");
             printf("Enter number : ");
             (void)scanf("%d", &option);
@@ -64,6 +68,13 @@ int main() {
                 break;
             case 5:
                 DeletePassenger(&head);
+                break;
+            case 6:
+                GenerateStatistics(head);
+                break;
+            case 7:
+                WriteReport(head, "report.txt");
+                break;
             case 10:
                 break;
             default:
@@ -418,4 +429,136 @@ int DeletePassenger(Passenger** head)
     printf("Deleted: %s %s (PPS %d)\n", cur->firstName, cur->lastName, cur->pps);
     free(cur);
     return 1;
+}
+
+void GenerateStatistics(Passenger* head) {
+    //local variables
+    //counters
+    int total = 0;
+    int dublin = 0;
+    int leinster = 0;
+    int connacht = 0;
+    int ulster = 0;
+    int munster = 0;
+
+    int classChoice;
+
+    if (head == NULL) {
+        printf("\nNo passengers in the list.\n");
+        return;
+    }
+
+
+    printf("\n---Generate Statistics---\n");
+    printf("Choose travel class:\n");
+    printf("1. Economy\n");
+    printf("2. First Class\n");
+    printf("Enter choice: ");
+    (void)scanf("%d", &classChoice);
+
+    //nested if statements in a while loop to count 
+    //each chosen province by looping through the linked list
+
+    Passenger* cur = head;
+    while (cur != NULL) {
+
+        //economy case
+        //count only if user chooses economy and only those in economy
+        if (classChoice == 1 && strcmp(cur->travelClass, "Economy") == 0) {
+            total++;
+
+            if (strcmp(cur->travelledFrom, "Dublin") == 0) {
+                dublin++;
+            }
+            else if (strcmp(cur->travelledFrom, "Leinster") == 0) {
+                leinster++;
+            }
+            else if (strcmp(cur->travelledFrom, "Connacht") == 0) {
+                connacht++;
+            }
+            else if (strcmp(cur->travelledFrom, "Ulster") == 0) {
+                ulster++;
+            }
+            else if (strcmp(cur->travelledFrom, "Munster") == 0) {
+                munster++;
+            }
+        }
+
+        //first class case
+        else if (classChoice == 2 && strcmp(cur->travelClass, "First Class") == 0) {
+            total++;
+
+            if (strcmp(cur->travelledFrom, "Dublin") == 0) {
+                dublin++;
+            }
+            else if (strcmp(cur->travelledFrom, "Leinster") == 0) {
+                leinster++;
+            }
+            else if (strcmp(cur->travelledFrom, "Connacht") == 0) {
+                connacht++;
+            }
+            else if (strcmp(cur->travelledFrom, "Ulster") == 0) {
+                ulster++;
+            }
+            else if (strcmp(cur->travelledFrom, "Munster") == 0) {
+                munster++;
+            }
+        }
+
+        cur = cur->next; //move to next passenger
+    }
+
+    if (total == 0) {
+        printf("\nNo passengers found for that class.\n");
+        return;
+    }
+
+    printf("\n---Statistics for %s---\n",
+        (classChoice == 1 ? "Economy" : "First Class"));
+
+    //multiplying province by a hundred then dividing by the total
+    //to get its percentage
+    printf("Dublin   : %.2f%%\n", (dublin * 100.0) / total);
+    printf("Leinster : %.2f%%\n", (leinster * 100.0) / total);
+    printf("Connacht : %.2f%%\n", (connacht * 100.0) / total);
+    printf("Ulster   : %.2f%%\n", (ulster * 100.0) / total);
+    printf("Munster  : %.2f%%\n", (munster * 100.0) / total);
+}
+
+void WriteReport(Passenger* head, const char* filename) {
+    //opening file in write mode
+    FILE* f = fopen(filename, "w");
+    if (f == NULL) {
+        printf("Could not open %s for writing.\n", filename);
+        return;
+    }
+
+    //pointer to the start of the file
+    fprintf(f, "=== Rail Ireland Passenger Report ===\n\n");
+
+    //if there are no elements in the linked list
+    if (head == NULL) {
+        fprintf(f, "No passengers in the list.\n");
+        fclose(f);
+        printf("Report written to %s (empty).\n", filename);
+        return;
+    }
+
+    //contents to file
+    Passenger* cur = head;
+    while (cur != NULL) {
+        fprintf(f, "PPS: %d\n", cur->pps);
+        fprintf(f, "Name: %s %s\n", cur->firstName, cur->lastName);
+        fprintf(f, "Year Born: %d\n", cur->yearBorn);
+        fprintf(f, "Email: %s\n", cur->emailAddress);
+        fprintf(f, "Travelled From: %s\n", cur->travelledFrom);
+        fprintf(f, "Travel Class: %s\n", cur->travelClass);
+        fprintf(f, "Trips Per Year: %s\n", cur->railTripsPerYear);
+        fprintf(f, "-----------------------------\n");
+        cur = cur->next;
+    }
+
+    //closing file
+    fclose(f);
+    printf("Report written to %s\n", filename);
 }
