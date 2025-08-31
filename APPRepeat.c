@@ -6,7 +6,7 @@
 
 //passenger struct 
 typedef struct Passenger {
-    int pps;                        // unique identifier
+    int pps;  
     char firstName[40];
     char lastName[40];
     int yearBorn;
@@ -20,33 +20,56 @@ typedef struct Passenger {
 
 void AddPassenger(Passenger** head);
 bool PasswordEntry();
-
+void DisplayAllPassengers(Passenger* head);
+void DisplayPassengerInfo(Passenger* head);
+void UpdatePassenger(Passenger* head);
+int DeletePassenger(Passenger** head);
 
 
 int main() {
     Passenger* head = NULL;  // start of linked list
 
-
-    int option;
+    //local declarations
+    int option = 0;
 
     printf("--- Rail Ireland Passenger Database ---\n");
 
     if (PasswordEntry() == true)
     {
-        printf("\n---Main Menu---");
-        printf("\n1. Add passenger\n");
-        printf("Enter number : ");
-        (void)scanf("%d", &option);
-
-        switch (option)
+        while(option != 10)
         {
-        case 1:
-            AddPassenger(&head);
-            break;
-        default:
-            break;
-        }
+            printf("\n---Main Menu---");
+            printf("\n1. Add passenger\n");
+            printf("2. Display all passengers\n");
+            printf("3. Display passenger info\n");
+            printf("4. Update passenger statistic\n");
+            printf("5. Delete passenger\n");
+            printf("10. Exit\n");
+            printf("Enter number : ");
+            (void)scanf("%d", &option);
 
+            switch (option)
+            {
+            case 1:
+                AddPassenger(&head);
+                break;
+            case 2:
+                DisplayAllPassengers(head);
+                break;
+            case 3:
+                DisplayPassengerInfo(head);
+                break;
+            case 4:
+                UpdatePassenger(head);
+                break;
+            case 5:
+                DeletePassenger(&head);
+            case 10:
+                break;
+            default:
+                break;
+            }
+        }
     }
 	return 0;
 }
@@ -83,7 +106,7 @@ bool PasswordEntry()
         //if the user inputted password and file password are the same, then grant access
         if (strcmp(userInputtedPassword, filePassword) == 0)
         {
-            printf("Admin logged in \n");
+            printf("Log-in successful \n");
             return true;
         }
         else
@@ -202,4 +225,197 @@ void AddPassenger(Passenger** head) {
     *head = newP;
 
     printf("\nPassenger added successfully\n");
+}
+
+void DisplayAllPassengers(Passenger* head) {
+    if (head == NULL) {
+        printf("\nNo passengers in the list.\n");
+        return;
+    }
+
+    printf("\n---Passenger List---\n");
+    Passenger* cur = head;
+    while (cur != NULL) {
+        printf("PPS: %d | %s %s\n", cur->pps, cur->firstName, cur->lastName);
+        cur = cur->next; // move to next passenger
+    }
+}
+
+void DisplayPassengerInfo(Passenger* head) {
+    int userInputtedPassengerPPS;
+    bool found = false;
+
+    printf("\n---Display Passenger Info---\n");
+    printf("Please enter PPS number of passenger : ");
+    (void)scanf("%d", &userInputtedPassengerPPS);
+
+    // Traverse the linked list
+    Passenger* cur = head;
+    while (cur != NULL) {
+        if (cur->pps == userInputtedPassengerPPS) {
+            // Match found, print details
+            printf("\nPPS : %d\n", cur->pps);
+            printf("Name : %s %s\n", cur->firstName, cur->lastName);
+            printf("Year Born : %d\n", cur->yearBorn);
+            printf("Email : %s\n", cur->emailAddress);
+            printf("Travelled From : %s\n", cur->travelledFrom);
+            printf("Travel Class : %s\n", cur->travelClass);
+            printf("Trips Per Year : %s\n", cur->railTripsPerYear);
+            found = true;
+            break;
+        }
+        //move to next passenger in the list 
+        cur = cur->next;
+    }
+
+    if (found == false) {
+        printf("\nNo passenger found with PPS %d.\n", userInputtedPassengerPPS);
+    }
+}
+
+void UpdatePassenger(Passenger* head) {
+
+    //local declartions
+    int searchPps;
+    int choice;
+    int option;
+
+    printf("\n--- Update Passenger ---\n");
+    printf("Enter PPS number of passenger to update: ");
+    scanf("%d", &searchPps);
+
+    Passenger* cur = head;
+    while (cur != NULL) {
+        // if cur->pps matches the passenger is found
+        if (cur->pps == searchPps) {
+            printf("\nPassenger found: %s %s (PPS %d)\n",
+                cur->firstName, cur->lastName, cur->pps);
+
+            printf("\nWhat would you like to update?\n");
+            printf("1. Email\n");
+            printf("2. Travelled From\n");
+            printf("3. Travel Class\n");
+            printf("4. Trips per Year\n");
+            printf("5. Year Born\n");
+            printf("Enter choice: ");
+            scanf("%d", &choice);
+
+            //nested switch statements for overwriting
+            switch (choice) {
+            case 1:
+                printf("Enter new email: ");
+                scanf("%s", cur->emailAddress);
+                break;
+            case 2: {
+                printf("Areas: 1.Dublin 2.Leinster 3.Connacht 4.Ulster 5.Munster\n");
+                scanf("%d", &option);
+                switch (option) {
+                case 1:
+                    strcpy(cur->travelledFrom, "Dublin");
+                    break;
+                case 2:
+                    strcpy(cur->travelledFrom, "Leinster");
+                    break;
+                case 3:
+                    strcpy(cur->travelledFrom, "Connacht");
+                    break;
+                case 4:
+                    strcpy(cur->travelledFrom, "Ulster");
+                    break;
+                case 5: strcpy(cur->travelledFrom, "Munster");
+                    break;
+                }
+                break;
+            }
+            case 3: {
+                int option;
+                printf("1. Economy  2. First Class\n");
+                scanf("%d", &option);
+                if (option == 1) {
+                    strcpy(cur->travelClass, "Economy");
+                }
+                else if (option == 2) {
+                    strcpy(cur->travelClass, "First Class");
+                }
+                break;
+            }
+            case 4: {
+                int option;
+                printf("1. <3  2. <5  3. 5+\n");
+                scanf("%d", &option);
+                if (option == 1) {
+                    strcpy(cur->railTripsPerYear, "<3");
+                }
+                else if (option == 2) {
+                    strcpy(cur->railTripsPerYear, "<5");
+                }
+                else if (option == 3) {
+                    strcpy(cur->railTripsPerYear, "5+");
+                }
+                break;
+            }
+            case 5:
+                printf("Enter new year born: ");
+                (void)scanf("%d", &cur->yearBorn);
+                break;
+            default:
+                printf("Invalid choice.\n");
+            }
+
+            printf("Passenger update successful\n");
+            return;
+        }
+        cur = cur->next; // keep searching
+    }
+
+    printf("No passenger found with PPS %d.\n", searchPps);
+}
+
+int DeletePassenger(Passenger** head)
+{
+    //local declarations 
+    int pps;
+
+    //if the linked list is empty
+    if (head == NULL || *head == NULL) {
+        printf("\nNo passengers in the list.\n");
+        return -1;
+    }
+
+    printf("\n--- Delete Passenger ---\n");
+    printf("Enter PPS number to delete: ");
+
+    //input validation to make sure user entered a number
+    if (scanf("%d", &pps) != 1) {
+        printf("Invalid input.\n");
+        return 0;
+    }
+
+    Passenger* cur = *head;
+    Passenger* prev = NULL;
+
+    // case 1: node to delete is the head
+    if (cur != NULL && cur->pps == pps) {
+        *head = cur->next;   // move head
+        printf("Deleted: %s %s (PPS %d)\n", cur->firstName, cur->lastName, cur->pps);
+        free(cur);
+        return 1;
+    }
+
+    // case 2: search the rest of the list
+    while (cur != NULL && cur->pps != pps) {
+        prev = cur;
+        cur = cur->next;
+    }
+
+    if (cur == NULL) { // not found
+        printf("No passenger found with PPS %d.\n", pps);
+        return 0;
+    }
+
+    // unlink and free the found node
+    prev->next = cur->next;
+    printf("Deleted: %s %s (PPS %d)\n", cur->firstName, cur->lastName, cur->pps);
+    free(cur);
+    return 1;
 }
